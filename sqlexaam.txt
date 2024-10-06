@@ -1,0 +1,164 @@
+-- # EXAM FOR WEEK 8
+
+-- ## KEEP IN MIND: YOU ARE DOING THIS FOR YOUR BRIGHT FUTURE, SO GIVE YOUR 120%!
+-- ## ПОМНИТЕ: ВЫ ДЕЛАЕТЕ ЭТО ДЛЯ СВОЕГО СВЕТЛОГО БУДУЩЕГО, ПОЭТОМУ ВЫКЛАДЫВАЙТЕСЬ НА ВСЕ СВОИ 120%!
+
+-- ## RULES:
+-- > No interner, no help to each other!
+
+-- > Make one file and place all your work there (e.g. azizmurod_orifzoda.py)
+
+-- > Send the file at 
+
+-- > You have 2 hours only
+
+-- ### Task 1 - CREATE
+-- Create tables: Employees, Departments, Locations, Jobs. 
+--  - Employees: id, first_name, last_name, email, phone_number, hire_date, job_id, salary, commision_pct, department_id.
+create table Employees(
+	id SERIAL primary key,
+	first_name varchar(50),
+	last_name varchar(50),
+	email varchar(50),
+	phone_number varchar(14),
+	hire_date date ,
+	job_id int references Jobs(id) on delete cascade,
+	salary int ,
+	commision_pct numeric(4,2),
+	department_id int references Departments(id) on delete cascade
+)
+drop table Employees
+
+--  - Departments: id, department_name, manager_name, location_id.
+create table Departments(
+	id serial primary key,
+	department_name varchar(50),
+	manager_name varchar(50),
+	location_id int unique references Locations(id) on delete cascade
+)
+drop table Departments
+--  - Locations: id, city, region, street_address.
+create table Locations(
+	id serial primary key,
+	city varchar(25),
+	region varchar(30),
+	street_address varchar(50)
+)
+drop table Locations
+
+--  - Jobs: id, title, is_active.
+create table Jobs(
+	id serial primary key,
+	title varchar(50),
+	is_active boolean
+)
+drop table Jobs
+--  Realationships:
+--  - one to one: Departments with Location
+--  - one to many: Departments with Employees
+--  - one to many: Jobs with Employees
+
+
+-- ### Task 2 - INSERT
+--  - INSEERT 5 JOBS - backend, frontend, fullstack, designer, manager.
+insert into jobs(title) values
+('backend'),
+('frontend'),
+('fullstack'),
+('designer'),
+('manager');
+--  - INSERT 3 DEPARTMENTS - management, accontant, development
+insert into Departments(
+department_name,manager_name
+) values 
+('management','Zoir'),
+('accontant','Nurulo'),
+('development','Masafi');
+
+--  - INSERT 5 LOCATION - any location
+insert into locations(city,region,street_address) values
+('dushanbe','firdavsi','hosilot'),
+('dushanbe1','firdavsi1','hosilot1'),
+('dushanbe2','firdavsi2','hosilot2'),
+('dushanbe3','firdavsi3','hosilot3'),
+('dushanbe4','firdavsi4','hosilot4');
+
+--  - INSERT 10 EMPLOYEES:
+--     - 3 employees must be managers of each department(3 сотрудника должны быть менеджерами каждого отдела)
+--     - 5 employees must be developers (5 сотрудников должны быть разработчиками)
+--     - 2 сотрудника должны быть из бухгалтерии
+insert into employees(first_name,last_name,email,phone_number,hire_date,job_id,salary,commission_percentage,department_id) values
+('sado','vohidzoda','sa@gmail.com','+99212234561','2024-01-01',1,1234,12.3,(select * from departments where id = 1)),
+('sado1','vohidzoda9','sa1@gmail.com','+99212234562','2024-02-02',2,1234,12.3,(select * from departments where id = 1)),
+('sado2','vohidzoda8','sa2@gmail.com','+99212234563','2024-03-03',3,1234,12.4,(select * from departments where id = 1)),
+('sado3','vohidzoda7','sa3@gmail.com','+99212234564','2024-04-04',4,1234,12.5,(select * from departments where id = 2)),
+('sado4','vohidzoda6','sa4@gmail.com','+99212234565','2024-05-05',5,1234,12.6,(select * from departments where id = 2)),
+('sado5','vohidzoda5','sa5@gmail.com','+99212234566','2024-06-06',5,1234,12.7,(select * from departments where id = 2)),
+('sado6','vohidzoda4','sa6@gmail.com','+99212234567','2024-07-07',4,1234,12.8,(select * from departments where id = 2)),
+('sado7','vohidzoda3','sa7@gmail.com','+99212234568','2024-08-08',3,1234,12.9,(select * from departments where id = 2)),
+('sado8','vohidzoda2','sa8@gmail.com','+99212234569','2024-09-09',2,1234,12.2,(select * from departments where id = 3)),
+('sado9','vohidzoda1','sa9@gmail.com','+99212234510','2024-10-10',1,1234,11.1,(select * from departments where id = 3));
+
+-- ### Task 3 ALTER
+--     a) Add a column to store employee birthdate (Добавьте столбец для хранения даты рождения сотрудника)
+alter table employees
+add column birth_date date 
+--     b) Change the data type of phone_number in employees to allow more characters (Измените тип данных phone_number в employees, чтобы разрешить больше символов)
+alter table employees
+alter column phone_number type varchar(15)
+--     c) Rename the commission_pct column to commission_percentage in employees(Переименуйте столбец commission_pct в commission_percentage в employees)
+alter table employees
+rename column commision_pct to commission_percentage
+--     d) Add a unique constraint on the email column in employees if it wasn't defined before (Добавьте уникальное ограничение для столбца email в employees, если оно не было определено ранее)
+alter table employees
+add constraint email 
+set unique
+--     e) Modify the is_active column in the jobs table to default to TRUE (Измените столбец is_active в таблице jobs, чтобы значение по умолчанию было TRUE)
+alter table jobs
+add constraint is_active 
+set default True
+
+
+-- ### Task 4 SELECT
+--     a) Filter all departments located in 'New York' (Отфильтровать все отделы, расположенные в «Нью-Йорке»)
+select * from departments d
+join Locations l on d.location_id = l.id
+where l.city = 'New York' 
+--     b) Filter all employees hired after January 1, 2022 (Отфильтровать всех сотрудников, нанятых после 1 января 2022 г.)
+select * from employees where hire_date > '2022-01-01'
+--     c) Filter employees whose email ends with '@example.com' (Отфильтровать сотрудников, чей адрес электронной почты заканчивается на «@example.com»)
+select * from employees where email like '%@example.com'
+
+--     d) Filter jobs where the title contains the word 'Manager' (Отфильтровать вакансии, в названии которых содержится слово «Менеджер»)
+select * from jobs where title like  '%Manager'
+
+--     e) Filter employees who do not belong to the departments with ids 2 and 4 (Отфильтровать сотрудников, которые не относятся к отделам с идентификаторами 2 и 4)
+select * from employees where department_id != 2 and department_id != 4
+--     f) Filter employees with a salary between 4000 and 8000 (Отфильтровать сотрудников с зарплатой от 4000 до 8000)
+select * from employees where salary>4000 and salary < 8000
+
+
+-- ### Task 5 JOIN
+--     a) Retrieve all employees along with their department names (Получить всех сотрудников вместе с названиями их отделов)
+select e.*,d.department_name from employees e
+join departments d on e.department_id = d.id
+
+--     b) Retrieve all employees, their department names, and the location city (Получить всех сотрудников, названия их отделов и город расположения)
+select e.*,d.department_name,l.city from employees e
+join departments d on e.department_id = d.id
+join locations l on d.location_id = l.id
+--     d) Retrieve all departments and their managers' names (include departments without managers) (Получить все отделы и имена их менеджеров (включая отделы без менеджеров))
+select department_name,manager_name from departments
+--     e) Retrieve all employees and their departments, including employees without departments and departments without employees (Получить всех сотрудников и их отделы, включая сотрудников без отделов и отделы без сотрудников)
+select * from employees e
+full join departments d on e.department_id = d.id
+--     f) Retrieve employees who work in the 'Sales' department along with their job titles (Получить сотрудников, которые работают в отделе «Продажи», вместе с их должностями)
+select e.first_name,d.department_name,j.title from employees e 
+join departments d on e.department_id = d.id
+join jobs j on d.location_id = j.id
+where d.id = 1
+--     g) Retrieve the number of employees in each department (Получить количество сотрудников в каждом отделе)
+
+
+--     h) Retrieve employees whose salary is higher than the average salary of their department (Получить сотрудников, чья зарплата выше средней зарплаты их отдела)
+select e.* from employees e where (select avg(salary) from employees ) > salary
